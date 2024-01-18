@@ -10,14 +10,25 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int totalSeconds = 1500;
+  static const thirtyMinutes = 1800;
+  int totalSeconds = thirtyMinutes;
   bool isRunning = false;
+  int totalPomodoro = 0;
   late Timer timer;
 
   void onTick(Timer timer) {
-    setState(() {
-      totalSeconds = totalSeconds - 1;
-    });
+    if (totalSeconds == 0) {
+      setState(() {
+        totalPomodoro = totalPomodoro + 1;
+        isRunning = false;
+        totalSeconds = thirtyMinutes;
+      });
+      timer.cancel();
+    } else {
+      setState(() {
+        totalSeconds = totalSeconds - 1;
+      });
+    }
   }
 
   void onStartPress() {
@@ -34,6 +45,15 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  String format(int seconds) {
+    var duration = Duration(seconds: seconds);
+    // print(duration.toString());
+    // print(duration.toString().split(".")); //.기준으로 나눈다 리스트로 반환
+    // print(duration.toString().split(".").first);// 첫번째를 선택
+    // print(duration.toString().split(".").first.substring(2,7)); //2번째부터 시작 7번째까지 잘라내기
+    return duration.toString().split(".").first.substring(2, 7);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(
               alignment: Alignment.bottomCenter,
               child: Text(
-                '$totalSeconds',
+                format(totalSeconds),
                 style: TextStyle(
                   color: Theme.of(context).cardColor,
                   fontSize: 89,
@@ -81,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'pomodoros',
+                          '완료',
                           style: TextStyle(
                             fontSize: 20,
                             color:
@@ -90,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         Text(
-                          '0',
+                          '$totalPomodoro',
                           style: TextStyle(
                             fontSize: 58,
                             color:
